@@ -4,7 +4,6 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-
 #Para verificar si un archivo/carpeta existe
 #os.path.exists()
 
@@ -36,18 +35,30 @@ def carpeta_imagenes(ruta):
                 print("Error, vuelva a ingresar número")
                 continue
             imagen = archivos[int(num)-1]
-            Image.open(imagen)
             break
     else:
         print("La ruta no existe")
         return None
     return imagen
 
+def fondos(ruta):
+    if os.path.exists(ruta):
+        archivos = os.listdir(ruta)
+        lis = " "
+        for i in range(len(archivos)):
+            img = f"\n{i+1}. {archivos[i]}"
+            lis += img    
+        fon = f"Lista de fondos: \n {lis}"
+    return fon
+
+
 
 #===== Llamar funciones =====#
 carpeta = carpeta_imagenes("Objetos/")
 print(carpeta)
 
+carp_fondos = fondos("Fondos/")
+print(carp_fondos)
 
 """""
 #def cargar_imagen():
