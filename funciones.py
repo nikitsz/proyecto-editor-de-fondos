@@ -39,8 +39,8 @@ def carpeta_imagenes(ruta):
     else:
         print("La ruta no existe")
         return None
-    return imagen
-
+    return os.path.join(ruta, imagen)
+"""
 def fondos(ruta):
     if os.path.exists(ruta):
         archivos = os.listdir(ruta)
@@ -50,16 +50,30 @@ def fondos(ruta):
             lis += img    
         fon = f"Lista de fondos: \n {lis}"
     return fon
-
+"""
 
 
 #===== Llamar funciones =====#
 carpeta = carpeta_imagenes("Objetos/")
 print(carpeta)
 
-carp_fondos = fondos("Fondos/")
+carp_fondos = ("Fondos/")
 print(carp_fondos)
 
+fondos = carpeta_imagenes(carp_fondos)
+print(fondos)
+
+
+imagen = Image.open(carpeta)#prepara la imagen para mostrarla o algo asi nose :b es necesario guardarlo en una variable
+print("el tamaño de la imagen es:", imagen.size)#vemos el tamaño de la imagen (lo dice en la rubrica )
+imagen.show()#muestra la imagen en la pántalla
+
+#########################################################
+#¡¡¡¡¡¡¡¡¡¡¡¡¡IMPORTANTE¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+#ningun cambio realizado aqui es definitivo solamente estaba probando codigos que nos podrian servir
+#y gemini me dijo que no era importante la interfaz pero yo lo quiero hacer con interfaz
+#elpepe67
+#########################################################
 """""
 #def cargar_imagen():
     objetos = "Objetos/"

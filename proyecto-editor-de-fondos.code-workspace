@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "proyecto-editor-de-fondos",
+			"path": "."
+		},
+		{
+			"name": "datos",
+			"path": "../../datos"
+		}
+	],
+	"settings": {}
+}
