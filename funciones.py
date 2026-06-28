@@ -60,7 +60,7 @@ def nueva_imagen(matriz_Obj, matriz_fondo):
     else:
         color_referencia = matriz_Obj[0, 0]
         
-        tolerancia = 15
+        tolerancia = 20
         
         diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
         
@@ -170,9 +170,8 @@ btn_fondo_1.on_clicked(accion_fondo_1)
 btn_fondo_2.on_clicked(accion_fondo_2)
 btn_guardar.on_clicked(accion_guardar)
 btn_reporte.on_clicked(accion_reporte)
-""""
+"""
 btn_guardar.on_clicked()
 """
-
 
 plt.show()
