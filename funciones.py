@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from matplotlib.widgets import Button
-
+from matplotlib.widgets import Button, Slider
 
 #====== Definición de funciones ======
 
@@ -50,7 +50,7 @@ def carpeta_fondos(ruta):
         return []
 
 # Función para reemplzara el fondo de la imagen
-def nueva_imagen(matriz_Obj, matriz_fondo):
+def nueva_imagen(matriz_Obj, matriz_fondo, tolerancia):
     copia_matriz = np.copy(matriz_Obj)
     
     transparencia_esquina = matriz_Obj[0, 0, 3] 
@@ -60,7 +60,6 @@ def nueva_imagen(matriz_Obj, matriz_fondo):
     else:
         color_referencia = matriz_Obj[0, 0]
         
-        tolerancia = 20
         
         diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
         
@@ -93,24 +92,32 @@ carp_fondos = carpeta_fondos("Fondos/")
 print(carp_fondos)
 
 matriz_Obj, matriz_fon1 = preparar_imagen(carpeta, carp_fondos[0])
-imagen_nuevo_fondo1 = nueva_imagen(matriz_Obj, matriz_fon1)
+imagen_nuevo_fondo1 = nueva_imagen(matriz_Obj, matriz_fon1, 15)
 
 matriz_Obj, matriz_fon2 = preparar_imagen(carpeta, carp_fondos[1])
-imagen_nuevo_fondo2 = nueva_imagen(matriz_Obj, matriz_fon2)
+imagen_nuevo_fondo2 = nueva_imagen(matriz_Obj, matriz_fon2, 15)
 """imagen_terminada = Image.fromarray(imagen_nuevo_fondo) # Convertimos la matriz matemática de vuelta a una imagen normal
 imagen_terminada.show()"""
 
 #=====| INTERFAZ GRÁFICA |======#
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(10, 6), facecolor="black")
 imagen_interfaz = ax.imshow(matriz_Obj)
 ax.set_title("Editor de Imágenes")
-ax.axis('off') 
+ax.axis('off')
+
+estado = {"fondo_actual": 0}
+
+esp_slider = plt.axes([0.25, 0.15, 0.5, 0.03], facecolor="lightgray")
+
+slider_tol = Slider(esp_slider, "tolerancia", valmin=0, valmax=100, valinit=15, valstep=1)
+slider_tol.label.set_color("white")
+slider_tol.valtext.set_color("white")
 # Creación de botones
-esp_btn_original = plt.axes([0.1, 0.05, 0.2, 0.075])
-esp_btn_fondo_1 = plt.axes([0.3, 0.05, 0.2, 0.075])
-esp_btn_fondo_2 = plt.axes([0.5, 0.05, 0.2, 0.075])
-esp_btn_guardar = plt.axes([0.7, 0.05, 0.2, 0.075])
-esp_btn_reporte = plt.axes([0.9, 0.05, 0.2, 0.075])
+esp_btn_original = plt.axes([0.02, 0.05, 0.17, 0.075])
+esp_btn_fondo_1 = plt.axes([0.21, 0.05, 0.17, 0.075])
+esp_btn_fondo_2 = plt.axes([0.40, 0.05, 0.17, 0.075])
+esp_btn_guardar = plt.axes([0.59, 0.05, 0.17, 0.075])
+esp_btn_reporte = plt.axes([0.78, 0.05, 0.17, 0.075])
 
 btn_original = Button(esp_btn_original, "Imagen original")
 btn_fondo_1 = Button(esp_btn_fondo_1, "Aplicar primer fondo")
@@ -119,29 +126,46 @@ btn_guardar = Button(esp_btn_guardar, "Guardar Imagen")
 btn_reporte = Button(esp_btn_reporte, "Reporte de Imagen")
 
 # Función para botones
+def actualizar_imagen(val=None):
+    tol = slider_tol.val
+
+    if estado["fondo_actual"] == 0:
+        imagen_interfaz.set_data(matriz_Obj)
+    elif estado["fondo_actual"] == 1:
+        img_nueva = nueva_imagen(matriz_Obj, matriz_fon1, tol)
+        imagen_interfaz.set_data(img_nueva)
+    elif estado["fondo_actual"] == 2:
+        img_nueva = nueva_imagen(matriz_Obj, matriz_fon2, tol)
+        imagen_interfaz.set_data(img_nueva)
+    plt.draw()            
+
+slider_tol.on_changed(actualizar_imagen)
+
 def accion_original(event):
-    imagen_interfaz.set_data(matriz_Obj)
-    plt.draw()
+    estado["fondo_actual"] = 0
+    actualizar_imagen()
 
 def accion_fondo_1(event):
-    imagen_interfaz.set_data(imagen_nuevo_fondo1)
-    plt.draw()
+    estado["fondo_actual"] = 1
+    actualizar_imagen()
 
 def accion_fondo_2(event):
-    imagen_interfaz.set_data(imagen_nuevo_fondo2)
-    plt.draw()
+    estado["fondo_actual"] = 2
+    actualizar_imagen()
 
 def accion_guardar(event):
-    matriz_actual = imagen_interfaz.get_array()
-    ahora = datetime.now()
-    fecha_hora = ahora.strftime("%Y-%m-%d_%H-hrs_%M-min_%S-seg")
-    nombre_archivo = f"_{fecha_hora}.png"
+    try:
+        matriz_actual = imagen_interfaz.get_array()
+        ahora = datetime.now()
+        fecha_hora = ahora.strftime("%Y-%m-%d_%H-hrs_%M-min_%S-seg")
+        nombre_archivo = f"_{fecha_hora}.png"
 
-    ruta_guardar = os.path.join("Objetos", nombre_archivo)
-    img_final = Image.fromarray(matriz_actual)
-    img_final.save(ruta_guardar)
-    print(f"La imagen ha sido guardada como: {ruta_guardar}")
-
+        ruta_guardar = os.path.join("Objetos", nombre_archivo)
+        img_final = Image.fromarray(matriz_actual)
+        img_final.save(ruta_guardar)
+        print(f"La imagen ha sido guardada como: {ruta_guardar}")
+    except Exception as e:
+        print(f"error al guardar: {e}")
 
 def accion_reporte(event):
     ahora = datetime.now()
@@ -164,6 +188,7 @@ def accion_reporte(event):
         for x, y in zip(coordenadas_x, coordenadas_y):
             archivo.write(f"({x},{y})\n")
     print(f"\nel nombre del archivo es: {nombre_archivo}")        
+
 
 btn_original.on_clicked(accion_original)
 btn_fondo_1.on_clicked(accion_fondo_1) 
