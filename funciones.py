@@ -191,7 +191,7 @@ def accion_reporte(event):
             mascara_fondo = matriz_Obj[:, :, 3] == 0
         else:
             color_referencia = matriz_Obj[0, 0]
-            tolerancia = 15
+            tolerancia = tol
             diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
             mascara_fondo = np.all(diferencia < tolerancia, axis=-1)
         mascara_objeto = ~mascara_fondo
