@@ -91,11 +91,22 @@ print(carpeta)
 carp_fondos = carpeta_fondos("Fondos/")
 print(carp_fondos)
 
-matriz_Obj, matriz_fon1 = preparar_imagen(carpeta, carp_fondos[0])
-imagen_nuevo_fondo1 = nueva_imagen(matriz_Obj, matriz_fon1, 15)
+if len(carp_fondos) < 2:
+    print("\n[ERROR CRÍTICO] Se necesitan al menos 2 imágenes en la carpeta 'Fondos/'.")
+    exit() 
 
-matriz_Obj, matriz_fon2 = preparar_imagen(carpeta, carp_fondos[1])
-imagen_nuevo_fondo2 = nueva_imagen(matriz_Obj, matriz_fon2, 15)
+try:
+    matriz_Obj, matriz_fon1 = preparar_imagen(carpeta, carp_fondos[0])
+    imagen_nuevo_fondo1 = nueva_imagen(matriz_Obj, matriz_fon1, 15)
+
+    matriz_Obj, matriz_fon2 = preparar_imagen(carpeta, carp_fondos[1])
+    imagen_nuevo_fondo2 = nueva_imagen(matriz_Obj, matriz_fon2, 15)
+
+
+except Exception as e:
+    print(f"\n[ERROR] Hubo un problema al procesar las imágenes: {e}")
+    exit()
+
 """imagen_terminada = Image.fromarray(imagen_nuevo_fondo) # Convertimos la matriz matemática de vuelta a una imagen normal
 imagen_terminada.show()"""
 
@@ -158,7 +169,7 @@ def accion_guardar(event):
         matriz_actual = imagen_interfaz.get_array()
         ahora = datetime.now()
         fecha_hora = ahora.strftime("%Y-%m-%d_%H-hrs_%M-min_%S-seg")
-        nombre_archivo = f"_{fecha_hora}.png"
+        nombre_archivo = f"resultado_{fecha_hora}.png"
 
         ruta_guardar = os.path.join("Objetos", nombre_archivo)
         img_final = Image.fromarray(matriz_actual)
@@ -168,27 +179,32 @@ def accion_guardar(event):
         print(f"error al guardar: {e}")
 
 def accion_reporte(event):
-    ahora = datetime.now()
-    fecha_hora = ahora.strftime("%d%m%Y_%H%M%S")
-    nombre_archivo = f"reporte_{fecha_hora}.txt "
-    transparencia_esquina = matriz_Obj[0, 0, 3]
-    if transparencia_esquina == 0:
-        mascara_fondo = matriz_Obj[:, :, 3] == 0
-    else:
-        color_referencia = matriz_Obj[0, 0]
-        tolerancia = 15
-        diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
-        mascara_fondo = np.all(diferencia < tolerancia, axis=-1)
-    mascara_objeto = ~mascara_fondo
-    cantidad_pixeles = np.sum(mascara_objeto)
-    coordenadas_y, coordenadas_x = np.where(mascara_objeto)
-    with open(nombre_archivo, "w") as archivo:
-        archivo.write(f"Cantidad de píxeles del objeto: {cantidad_pixeles}\n\n")
-        archivo.write("Coordenadas:\n\n")
-        for x, y in zip(coordenadas_x, coordenadas_y):
-            archivo.write(f"({x},{y})\n")
-    print(f"\nel nombre del archivo es: {nombre_archivo}")        
-
+    try:
+        ahora = datetime.now()
+        fecha_hora = ahora.strftime("%d%m%Y_%H%M%S")
+        nombre_archivo = f"reporte_{fecha_hora}.txt"
+        
+        tol = slider_tol.val
+        
+        transparencia_esquina = matriz_Obj[0, 0, 3]
+        if transparencia_esquina == 0:
+            mascara_fondo = matriz_Obj[:, :, 3] == 0
+        else:
+            color_referencia = matriz_Obj[0, 0]
+            tolerancia = 15
+            diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
+            mascara_fondo = np.all(diferencia < tolerancia, axis=-1)
+        mascara_objeto = ~mascara_fondo
+        cantidad_pixeles = np.sum(mascara_objeto)
+        coordenadas_y, coordenadas_x = np.where(mascara_objeto)
+        with open(nombre_archivo, "w") as archivo:
+            archivo.write(f"Cantidad de píxeles del objeto: {cantidad_pixeles}\n\n")
+            archivo.write("Coordenadas:\n\n")
+            for x, y in zip(coordenadas_x, coordenadas_y):
+                archivo.write(f"({x},{y})\n")
+        print(f"\nel nombre del archivo es: {nombre_archivo}")        
+    except Exception as e:
+        print(f"error al hacer el reporte: {e}")
 
 btn_original.on_clicked(accion_original)
 btn_fondo_1.on_clicked(accion_fondo_1) 
@@ -199,4 +215,4 @@ btn_reporte.on_clicked(accion_reporte)
 btn_guardar.on_clicked()
 """
 
-plt.show()
+plt.show() 
