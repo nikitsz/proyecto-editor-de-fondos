@@ -43,7 +43,7 @@ def carpeta_fondos(ruta):
         for archivo in archivos:
             direccion = os.path.join(ruta, archivo)
             rutas.append(direccion)    
-        print(f"Cargando {len(rutas)} automáticamente")
+        print(f"Cargando {len(rutas)} imágenes de fondo automáticamente")
         return rutas
     else:
         print("La ruta no existe") 
