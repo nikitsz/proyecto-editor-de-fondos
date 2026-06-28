@@ -142,20 +142,37 @@ def accion_guardar(event):
     img_final.save(ruta_guardar)
     print(f"La imagen ha sido guardada como: {ruta_guardar}")
 
-"""
-def accion_reporte(event):
-    e we este lo voy a hacer yo
-"""
 
+def accion_reporte(event):
+    ahora = datetime.now()
+    fecha_hora = ahora.strftime("%d%m%Y_%H%M%S")
+    nombre_archivo = f"reporte_{fecha_hora}.txt "
+    transparencia_esquina = matriz_Obj[0, 0, 3]
+    if transparencia_esquina == 0:
+        mascara_fondo = matriz_Obj[:, :, 3] == 0
+    else:
+        color_referencia = matriz_Obj[0, 0]
+        tolerancia = 15
+        diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
+        mascara_fondo = np.all(diferencia < tolerancia, axis=-1)
+    mascara_objeto = ~mascara_fondo
+    cantidad_pixeles = np.sum(mascara_objeto)
+    coordenadas_y, coordenadas_x = np.where(mascara_objeto)
+    with open(nombre_archivo, "w") as archivo:
+        archivo.write(f"Cantidad de píxeles del objeto: {cantidad_pixeles}\n\n")
+        archivo.write("Coordenadas:\n\n")
+        for x, y in zip(coordenadas_x, coordenadas_y):
+            archivo.write(f"({x},{y})\n")
+    print(f"\nel nombre del archivo es: {nombre_archivo}")        
 
 btn_original.on_clicked(accion_original)
 btn_fondo_1.on_clicked(accion_fondo_1) 
 btn_fondo_2.on_clicked(accion_fondo_2)
 btn_guardar.on_clicked(accion_guardar)
-
+btn_reporte.on_clicked(accion_reporte)
 """"
 btn_guardar.on_clicked()
-btn_reporte.on_clicked()"""
+"""
 
 
 plt.show()
