@@ -71,9 +71,8 @@ def nueva_imagen(matriz_Obj, matriz_fondo, tolerancia):
 
 def preparar_imagen(ruta_Obj, ruta_Fon):
     fondo = Image.open(ruta_Fon).convert("RGBA")
-    imagen = Image.open(ruta_Obj).convert("RGBA")#prepara la imagen para mostrarla o algo asi nose :b es necesario guardarlo en una variable
-    #if matriz_Obj.endsWith(".PNG"):
-    #else:    
+    imagen = Image.open(ruta_Obj).convert("RGBA")
+     
     T_imagen = imagen.size
     print("el tamaño de la imagen es:", imagen.size, "por lo que el tamaño del fondo se a modificado a:", imagen.size)#vemos el tamaño de la imagen (lo dice en la rubrica )
     fondo_ajustado = fondo.resize(T_imagen)
@@ -83,8 +82,6 @@ def preparar_imagen(ruta_Obj, ruta_Fon):
 
 #=====| Llamar funciones |=====#
  
-"""print(matriz_Obj.shape)
-print(matriz_fon.shape)"""
 
 carpeta = carpeta_imagenes("Objetos/")
 print(carpeta)
@@ -107,8 +104,6 @@ except Exception as e:
     print(f"\n[ERROR] Hubo un problema al procesar las imágenes: {e}")
     exit()
 
-"""imagen_terminada = Image.fromarray(imagen_nuevo_fondo) # Convertimos la matriz matemática de vuelta a una imagen normal
-imagen_terminada.show()"""
 
 #=====| INTERFAZ GRÁFICA |======#
 fig, ax = plt.subplots(figsize=(10, 6), facecolor="black")
@@ -191,7 +186,7 @@ def accion_reporte(event):
             mascara_fondo = matriz_Obj[:, :, 3] == 0
         else:
             color_referencia = matriz_Obj[0, 0]
-            tolerancia = 15
+            tolerancia = tol
             diferencia = np.abs(matriz_Obj.astype(int) - color_referencia.astype(int))
             mascara_fondo = np.all(diferencia < tolerancia, axis=-1)
         mascara_objeto = ~mascara_fondo
@@ -211,8 +206,6 @@ btn_fondo_1.on_clicked(accion_fondo_1)
 btn_fondo_2.on_clicked(accion_fondo_2)
 btn_guardar.on_clicked(accion_guardar)
 btn_reporte.on_clicked(accion_reporte)
-"""
-btn_guardar.on_clicked()
-"""
+
 
 plt.show() 
